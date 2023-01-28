@@ -1,35 +1,69 @@
-           .model small
+ .model small
 
-            .stack 100h
+.stack 100h
 
-            .data
+.data
 
-buff        db  26        ;MAX NUMBER OF CHARACTERS ALLOWED (25).
+inputBuffer db  100 ;MAX NUMBER OF CHARACTERS ALLOWED (25).
             db  ?         ;NUMBER OF CHARACTERS ENTERED BY USER.
             db  26 dup(0) ;CHARACTERS ENTERED BY USER.
 
-            .code
+enterString db 'INPUT: $'
+            db 0dh
+            db 0ah
+            db '$'
+
+outputString db 'OUTPUT: $'
+             db 0dh
+             db 0ah
+             db '$'
+
+newLine db 0dh 
+        db 0ah
+        db '$'
+
+
+.code
+
 main:
-            mov ax, @data
-            mov ds, ax              
+            mov ax, @data ;WE NEED THIS TO STORE DATA IN DATA SEGMENT.
+            mov ds, ax
+
+; PRINT INPUT PROMPT
+            mov ah, 9
+            mov dx, offset enterString
+            int 21h                      
 
 ;CAPTURE STRING FROM KEYBOARD.                                    
             mov ah, 0Ah ;SERVICE TO CAPTURE STRING FROM KEYBOARD.
-            mov dx, offset buff
+            mov dx, offset inputBuffer
             int 21h                 
 
 ;CHANGE CHR(13) BY '$'.
-            mov si, offset buff + 1 ;NUMBER OF CHARACTERS ENTERED.
+            mov si, offset inputBuffer + 1 ;NUMBER OF CHARACTERS ENTERED.
             mov cl, [ si ] ;MOVE LENGTH TO CL.
             mov ch, 0      ;CLEAR CH TO USE CX. 
             inc cx ;TO REACH CHR(13).
             add si, cx ;NOW SI POINTS TO CHR(13).
             mov al, '$'
-            mov [ si ], al ;REPLACE CHR(13) BY '$'.            
+            mov [ si ], al ;REPLACE CHR(13) BY '$'. 
+
+; NEWLINE
+            mov ah, 9
+            mov dx, offset newLine
+            int 21h
+
+; PRINT OUTPUT PROMPT
+            mov ah, 9
+            mov dx, 0ah
+            int 21h
+            mov ah, 9
+            mov dx, offset outputString
+            int 21h
 
 ;DISPLAY STRING.                   
             mov ah, 9 ;SERVICE TO DISPLAY STRING.
-            mov dx, offset buff + 2 ;MUST END WITH '$'.
+            mov dx, offset inputBuffer + 2 ;MUST END WITH '$'.
             int 21h
 
             mov ah, 4ch
