@@ -6,7 +6,7 @@
 
 inputBuffer db  100 ;MAX NUMBER OF CHARACTERS ALLOWED (25).
             db  ?         ;NUMBER OF CHARACTERS ENTERED BY USER.
-            db  26 dup(0) ;CHARACTERS ENTERED BY USER.
+            db  100 dup(0) ;CHARACTERS ENTERED BY USER.
 
 enterString db 'INPUT: $'
             db 0dh
@@ -14,6 +14,11 @@ enterString db 'INPUT: $'
             db '$'
 
 outputString db 'OUTPUT: $'
+             db 0dh
+             db 0ah
+             db '$'
+
+descString db 'THIS IS A PROGRAM THAT ACCEPTS A STRING AND OUTPUTS IT. $'
              db 0dh
              db 0ah
              db '$'
@@ -28,6 +33,16 @@ newLine db 0dh
 main:
             mov ax, @data ;WE NEED THIS TO STORE DATA IN DATA SEGMENT.
             mov ds, ax
+
+; PRINT DESCRIPTION PROMPT
+            mov ah, 9
+            mov dx, offset descString
+            int 21h
+
+; NEWLINE
+            mov ah, 9
+            mov dx, offset newLine
+            int 21h
 
 ; PRINT INPUT PROMPT
             mov ah, 9
@@ -54,9 +69,6 @@ main:
             int 21h
 
 ; PRINT OUTPUT PROMPT
-            mov ah, 9
-            mov dx, 0ah
-            int 21h
             mov ah, 9
             mov dx, offset outputString
             int 21h
